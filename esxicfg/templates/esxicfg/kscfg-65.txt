@@ -1,0 +1,67 @@
+# Accept the VMware End User License Agreement
+vmaccepteula
+# Set the root password for the DCUI and Tech Support Mode
+rootpw --iscrypted {{ data.password_hash }}
+# The install media is in the CD-ROM drive
+installorupgrade --firstdisk=vmw_ahci --overwritevmfs
+# Set the network to DHCP on the proper network adapter based on its type
+network --bootproto=dhcp
+reboot
+%firstboot --interpreter=busybox
+# Fetch packet MD
+wget http://metadata.packet.net/metadata -O /tmp/metadata
+uuid=$(cat /tmp/metadata | python -c "import sys, json; print(json.load(sys.stdin)['id'])")
+hostname=$(cat /tmp/metadata | python -c "import sys, json; print(json.load(sys.stdin)['hostname'])")
+# Set hostname
+esxcli system hostname set --fqdn=$hostname
+# Enable shell
+vim-cmd hostsvc/enable_esx_shell
+vim-cmd hostsvc/start_esx_shell
+{% if data.network_autoconfig == 4 %}
+# Add private network interface
+esxcli network vswitch standard portgroup add --portgroup-name='Private Network' --vswitch-name=vSwitch0
+esxcli network ip interface add --interface-name=vmk1 --portgroup-name='Private Network'
+{% endif %}
+{% if data.network_autoconfig == 2 or data.network_autoconfig == 4 %}
+# Set the iSCSI IQN
+iqn=$(cat /tmp/metadata | python -c "import sys, json; print(json.load(sys.stdin)['iqn'])")
+esxcli iscsi software set --enabled=true
+esxcli iscsi adapter set -A vmhba64 -n $iqn
+esxcli iscsi networkportal add -n vmk1 -A vmhba64
+{% endif %}
+{% if data.network_autoconfig == 1 %}
+esxcli network ip interface ipv4 set -i vmk0 -t static -I {{ data.network_manualip }} -N {{ data.network_manualnm }} -g {{ data.network_manualgw }}
+
+{% endif %}
+{% if data.network_autoconfig == 2 %}
+{%  include 'esxicfg/netcfg-publiconly.py2' %}
+{% endif %}
+{% if data.network_autoconfig == 3 %}
+{%  include 'esxicfg/netcfg-privateonly.py2' %}
+{% endif %}
+{% if data.network_autoconfig == 4 %}
+{%  include 'esxicfg/netcfg-publicprivate.py2' %}
+{% endif %}
+{% if data.ssh_config == 2 %}
+# Setup public SSH key auth for root
+wget http://metadata.packet.net/2009-04-04/meta-data/public-keys -O /etc/ssh/keys-root/authorized_keys
+# Disable SSH password auth and force public key auth
+echo 'ChallengeResponseAuthentication no' >> /etc/ssh/sshd_config
+{% endif %}
+{% if data.ssh_config > 0 %}
+# Enable ssh
+vim-cmd hostsvc/enable_ssh
+{% endif %}
+# Ensure serial port is activated
+esxcli system settings kernel set -s logPort -v none
+esxcli system settings kernel set -s gdbPort -v none
+esxcli system settings kernel set -s tty2Port -v com2
+reboot
+%post --interpreter=busybox
+esxcli system settings kernel set -s logPort -v none
+esxcli system settings kernel set -s gdbPort -v none
+esxcli system settings kernel set -s tty2Port -v com2
+%pre --interpreter=busybox
+BOOTOPTIONS=$(/sbin/bootOption -o)
+echo $BOOTOPTIONS > /cmdline-bootoption
+echo $BOOTOPTIONS > /tmp/pre-bootoptions

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+        <title>Packet Labs ESXi Configurator: Success</title>
+    </head>
+    <body>
+        <h1>Configuration Successfully Generated</h1>
+        <br>
+
+        {% if error_message %}<div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>{% endif %}
+
+        <div class="alert alert-info" role="alert">A random password has been generated for the install, please make a note of as this is the ony time it will be displayed. We strongly recommend changing it upon first login. The password is <code>{{ password }}</code></div>
+
+        <p>Your custom iPXE installation URL is <code>http://appconfig.packet.cloud/ipxe/{{ node_id }}</code></p>
+
+        <p>When selecting a new instance on the Packet portal, be sure to use Custom iPXE as the OS with the above URL. You also will need to ensure that the public and private IP allocation subnets are at least <pre>/30</pre> in size. Even if you are not planning on using these IPs in your deployment this is critical.</p>
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+    </body>
+</html>

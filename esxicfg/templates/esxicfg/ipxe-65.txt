@@ -1,0 +1,10 @@
+#!ipxe
+iseq ${platform} efi && goto is_efi
+echo ESXi Installer BIOS mode
+kernel http://installers.packet.cloud/6.5.0-20181104001/mboot.c32 -c http://appconfig.packet.cloud/esxibootcfg/{{ node_id }} gdbPort=none logPort=none tty2port=com2 BOOTIF=01-${net0/mac}
+boot
+
+:is_efi
+echo ESXi Installer (U)EFI mode
+kernel http://installers.packet.cloud/6.5.0-20181104001/EFI/BOOT/BOOTX64.EFI -c http://appconfig.packet.cloud/esxibootcfg/{{ node_id }} gdbPort=none logPort=none tty2port=com2 BOOTIF=01-${net0/mac}
+boot

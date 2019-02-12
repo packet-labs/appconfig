@@ -1,0 +1,29 @@
+# Configure Public & Private IP addresses statically from metadata using python
+cat >> /tmp/netcfg.py <<EOF
+import sys
+import json
+import subprocess
+def exec(cmd):
+  print(cmd + "\n")
+  subprocess.call(cmd, shell=True)
+with open('/tmp/metadata', 'r') as json_file:
+  packet_metadata = json.load(json_file)
+for addr in packet_metadata['network']['addresses']:
+  if addr['public'] == True:
+    interface = "vmk0"
+  else:
+    interface = "vmk1"
+  if addr['address_family'] == 4:
+    if interface == "vmk1":
+      exec("esxcli network ip interface ipv4 set -i " + interface + " -t static -I " + addr['address'] + " -N " + addr['netmask'])
+      exec("esxcli network ip route ipv4 add --gateway " + addr['gateway'] + " --network 10.0.0.0/8")
+    else:
+      exec("esxcli network ip interface ipv4 set -i " + interface + " -t static -I " + addr['address'] + " -N " + addr['netmask'] + " -g " + addr['gateway'])
+  elif addr['address_family'] == 6:
+    exec("esxcli network ip interface ipv6 set -i " + interface + " -e true")
+    exec("esxcli network ip interface ipv6 address add -i " + interface + " -I " + addr['address'] + "/" + str(addr['cidr']))
+    exec("esxcli network ip interface ipv6 set -i " + interface + " -g " + addr['gateway'])
+  else:
+    print("Skipping unknown address_family [" + addr['address_family'] +"]\n")
+EOF
+python /tmp/netcfg.py
