@@ -3,7 +3,7 @@ vmaccepteula
 # Set the root password for the DCUI and Tech Support Mode
 rootpw --iscrypted {{ data.password_hash }}
 # The install media is in the CD-ROM drive
-installorupgrade --firstdisk=lsi_msgpt3,vmw_ahci --overwritevmfs
+installorupgrade --firstdisk=lsi_mr3,lsi_msgpt3,vmw_ahci --overwritevmfs
 # Set the network to DHCP on the proper network adapter based on its type
 network --bootproto=dhcp
 reboot
