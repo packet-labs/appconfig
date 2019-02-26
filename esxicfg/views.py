@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.http import HttpResponse
+from django.conf import settings
 
 from .models import Node
 
@@ -13,7 +14,7 @@ from esxicfg.forms import RequestedConfigForm
 def index(request):
     template = loader.get_template('esxicfg/mainpage.html')
     context = {
-
+        'SITE_FQDN': settings.SITE_FQDN
     }
     return HttpResponse(template.render(context, request))
 
@@ -29,6 +30,7 @@ def buildconfig(request):
             newNode = Node(password_hash=password_hash, network_autoconfig=request.POST['NetworkMode'], network_vlan=request.POST['NetworkVLAN'], network_manualip=request.POST['NetworkIP'], network_manualnm=request.POST['NetworkNM'], network_manualgw=request.POST['NetworkGW'], ssh_config=request.POST['SSHmode'])
             newNode.save()
             context = {
+                'SITE_FQDN': settings.SITE_FQDN,
                 'password': password,
                 'node_id': newNode.id
             }
@@ -50,6 +52,7 @@ def buildconfig(request):
 def ipxe(request, node_id):
     template = loader.get_template('esxicfg/ipxe-65.txt')
     context = {
+        'SITE_FQDN': settings.SITE_FQDN,
         'node_id': node_id
     }
     return HttpResponse(template.render(context, request), content_type="text/plain")
@@ -57,6 +60,7 @@ def ipxe(request, node_id):
 def bootcfg(request, node_id):
     template = loader.get_template('esxicfg/bootcfg-65.txt')
     context = {
+        'SITE_FQDN': settings.SITE_FQDN,
         'node_id': node_id
     }
     return HttpResponse(template.render(context, request), content_type="text/plain")
@@ -69,6 +73,7 @@ def kscfg(request, node_id):
         return HttpResponse("404")
     else:
         context = {
+            'SITE_FQDN': settings.SITE_FQDN,
             'node_id': node_id,
             'data': data
         }
