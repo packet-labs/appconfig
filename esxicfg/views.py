@@ -32,7 +32,8 @@ def buildconfig(request):
             context = {
                 'SITE_FQDN': settings.SITE_FQDN,
                 'password': password,
-                'node_id': newNode.id
+                'node_id': newNode.id,
+		'esxi_version': request.POST['ESXiVersion']
             }
             return HttpResponse(template.render(context, request))
         else:
@@ -49,19 +50,21 @@ def buildconfig(request):
         return HttpResponse(template.render(content, request))
 
 
-def ipxe(request, node_id):
+def ipxe(request, node_id, esxi_version):
     template = loader.get_template('esxicfg/ipxe-65.txt')
     context = {
         'SITE_FQDN': settings.SITE_FQDN,
-        'node_id': node_id
+        'node_id': node_id,
+	'esxi_version': esxi_version
     }
     return HttpResponse(template.render(context, request), content_type="text/plain")
 
-def bootcfg(request, node_id):
+def bootcfg(request, node_id, esxi_version):
     template = loader.get_template('esxicfg/bootcfg-65.txt')
     context = {
         'SITE_FQDN': settings.SITE_FQDN,
-        'node_id': node_id
+        'node_id': node_id,
+        'esxi_version': esxi_version
     }
     return HttpResponse(template.render(context, request), content_type="text/plain")
 
