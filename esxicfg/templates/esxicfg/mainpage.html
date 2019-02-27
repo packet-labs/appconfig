@@ -22,7 +22,7 @@
             {% csrf_token %}
             <div class="form-group">
                 <label for="NetworkMode">Network Configuration Mode</label>
-                <select class="form-control" name="NetworkMode">
+                <select class="form-control" name="NetworkMode" id="NetworkMode">
                     <option value="4">Management on 1st Public IP and 1st Private IP configured on vmkernel1</option>
                     <option value="3">Management on 1st Public IP only</option>
                     <option value="2" selected>Management on 1st Private IP (recommended)</option>
@@ -78,22 +78,16 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 
         <script>
-         $(document).ready(function() {
-             $.viewMap = {
-                 '0' : $('IPconfig0'),
-                 '1' : $([]),
-                 '2' : $([]),
-                 '3' : $([]),
-                 '4' : $([])
-             };
-
-             $('#NetworkMode').change(function() {
-                 // hide all
-                 $.each($.viewMap, function() { this.hide(); });
-                 // show current
-                 $.viewMap[$(this).val()].show();
-             });
-         });
-        </script>
+        $( document ).ready(function() {
+            $("#IPconfig0").hide();
+            $('#NetworkMode').change(function(){
+                if( $(this).val()==="0"){
+                    $("#IPconfig0").show()
+                } else {
+                    $("#IPconfig0").hide()
+                }
+            });
+	});
+	</script>
     </body>
 </html>
