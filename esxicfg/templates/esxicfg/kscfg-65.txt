@@ -29,9 +29,11 @@ esxcli iscsi software set --enabled=true
 esxcli iscsi adapter set -A vmhba64 -n $iqn
 esxcli iscsi networkportal add -n vmk1 -A vmhba64
 {% endif %}
-{% if data.network_autoconfig == 1 %}
+{% if data.network_autoconfig == 0 %}
 esxcli network ip interface ipv4 set -i vmk0 -t static -I {{ data.network_manualip }} -N {{ data.network_manualnm }} -g {{ data.network_manualgw }}
+{% if data.network_vlan > 0 %}
 esxcli network vswitch standard portgroup set -p="Management Network" -v={{ data.network_vlan }}
+{% endif %}
 esxcli network ip set --ipv6-enabled=false
 {% endif %}
 {% if data.network_autoconfig == 2 %}
