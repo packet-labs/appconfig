@@ -1,3 +1,9 @@
+![](https://img.shields.io/badge/Stability-EndOfLife-black.svg)
+
+## End of Life Statement
+
+This repository is [End of Life](https://github.com/packethost/standards/blob/master/end-of-life-statement.md) that this software is no longer supported nor maintained by Packet or its community.
+
 # Packet Labs AppConfig
 
 This is a very simple web tool to build iPXE templates for various complex applications that can be deployed on Packet. There is a small list of applications currently supported:
